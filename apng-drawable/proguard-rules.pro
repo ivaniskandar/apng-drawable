@@ -20,10 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.linecorp.apng.decoder.** {
-  public *;
-}
-
 -keep class com.linecorp.apng.decoder.Apng$DecodeResult {
   *;
 }
