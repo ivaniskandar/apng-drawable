@@ -1,0 +1,7 @@
+# configuration file for building snapshots and releases with jitpack.io
+jdk:
+  - openjdk17
+before_install:
+  - cat libpng_version | xargs ./download_libpng_and_apply_apng_patch.sh
+install:
+  - ./gradlew clean publishToMavenLocal

@@ -215,7 +215,7 @@ class ApngDrawableTest {
 
         repeat (3) {
             target.registerAnimationCallback(object : Animatable2Compat.AnimationCallback() {
-                override fun onAnimationEnd(drawable: Drawable?) {
+                override fun onAnimationEnd(drawable: Drawable) {
                     target.unregisterAnimationCallback(this)
                 }
             })

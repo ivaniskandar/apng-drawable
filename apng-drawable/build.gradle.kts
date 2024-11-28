@@ -14,10 +14,12 @@ group = ModuleConfig.groupId
 version = ModuleConfig.version
 
 android {
+    namespace = "com.linecorp.apng"
+
     defaultConfig {
         minSdk = Versions.minSdkVersion
         compileSdk = Versions.compileSdkVersion
-        targetSdk = Versions.targetSdkVersion
+        lint.targetSdk = Versions.targetSdkVersion
         version = ModuleConfig.version
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles(
@@ -57,8 +59,6 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments += "-DCMAKE_BUILD_TYPE=RELEASE"
-                    cppFlags -= "-DBUILD_DEBUG"
-                    cFlags -= "-DBUILD_DEBUG"
                 }
             }
         }
@@ -72,6 +72,13 @@ android {
     lint {
         xmlReport = true
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 ktlint {
@@ -82,7 +89,7 @@ ktlint {
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk7", Versions.kotlinVersion))
+    api(kotlin("stdlib", Versions.kotlinVersion))
     api(Libs.androidxAnnotation)
     api(Libs.androidxVectorDrawable)
 
@@ -90,16 +97,6 @@ dependencies {
     testImplementation(Libs.robolectric)
     testImplementation(Libs.mockitoInline)
     testImplementation(Libs.mockitoKotlin)
-}
-
-val sourcesJarTask = tasks.create<Jar>("sourcesJar") {
-    archiveClassifier.set("sources")
-    from(android.sourceSets["main"].java.srcDirs)
-}
-
-val javadocJarTask = tasks.create<Jar>("javadocJar") {
-    archiveClassifier.set("javadoc")
-    from(tasks.getByName("dokkaJavadoc"))
 }
 
 afterEvaluate {
@@ -140,42 +137,7 @@ afterEvaluate {
                 }
 
                 from(components["release"])
-                artifact(sourcesJarTask)
-                artifact(javadocJarTask)
-            }
-        }
-        repositories {
-            maven {
-                name = "MavenCentral"
-                val releaseRepositoryUrl =
-                    "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                val snapshotRepositoryUrl =
-                    "https://oss.sonatype.org/content/repositories/snapshots/"
-                val repositoryUrl = if (ModuleConfig.version.endsWith("SNAPSHOT")) {
-                    snapshotRepositoryUrl
-                } else {
-                    releaseRepositoryUrl
-                }
-                val repositoryUsername: String? by project
-                val repositoryPassword: String? by project
-
-                setUrl(repositoryUrl)
-                credentials {
-                    username = repositoryUsername ?: ""
-                    password = repositoryPassword ?: ""
-                }
             }
         }
     }
-    signing {
-        val signingKey: String? by project
-        val signingPassword: String? by project
-
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications["apngDrawable"])
-    }
-}
-
-artifacts {
-    add("archives", sourcesJarTask)
 }

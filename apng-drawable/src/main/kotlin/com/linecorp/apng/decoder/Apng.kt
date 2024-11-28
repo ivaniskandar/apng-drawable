@@ -23,7 +23,6 @@ import android.graphics.Rect
 import android.os.Trace
 import android.util.Log
 import androidx.annotation.IntRange
-import com.linecorp.apng.BuildConfig
 import java.io.InputStream
 
 /**
@@ -79,7 +78,7 @@ internal class Apng(
     val isRecycled: Boolean
         get() = bitmap.isRecycled
 
-    val config: Bitmap.Config
+    val config: Bitmap.Config?
         get() = bitmap.config
 
     fun recycle() {
@@ -90,7 +89,7 @@ internal class Apng(
 
     @Suppress("unused")
     fun finalize() {
-        if (BuildConfig.DEBUG) {
+        if (DEBUG) {
             Log.d("apng-drawable", "finalized: $id")
         }
         recycle()
@@ -198,3 +197,5 @@ internal class Apng(
         }
     }
 }
+
+private const val DEBUG = false

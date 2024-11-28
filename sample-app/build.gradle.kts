@@ -1,16 +1,16 @@
-import org.jetbrains.kotlin.config.KotlinCompilerVersion
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
 }
 
 android {
-    compileSdkVersion(Versions.compileSdkVersion)
+    namespace = "com.linecorp.apngsample"
+
     defaultConfig {
         applicationId = "com.linecorp.apngsample"
-        minSdkVersion(Versions.minSdkVersion)
-        targetSdkVersion(Versions.targetSdkVersion)
+        minSdk = Versions.minSdkVersion
+        compileSdk = Versions.compileSdkVersion
+        targetSdk = Versions.targetSdkVersion
         versionCode = 1
         versionName = "1.0"
         missingDimensionStrategy("env", "androidx")
@@ -33,15 +33,17 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = true
-        }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk7", KotlinCompilerVersion.VERSION))
+    implementation(kotlin("stdlib", Versions.kotlinVersion))
     implementation(Libs.androidxAppcompat)
     implementation(Libs.androidxConstraintLayout)
     implementation(Libs.kotlinxCoroutines)

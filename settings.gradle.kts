@@ -3,7 +3,7 @@ rootProject.name = "apng-drawable-root"
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        jcenter()
+        mavenCentral()
         google()
     }
     resolutionStrategy {
