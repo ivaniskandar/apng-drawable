@@ -170,24 +170,14 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_draw(
     jint index,
     jobject bitmap
 ) {
+  if (id < 0 || index < 0) {
+    return;
+  }
+
   void *data;
-
-  if (id < 0) {
-    return;
-  }
-  if (index < 0) {
-    return;
-  }
-
-  int32_t result;
-  if ((result = AndroidBitmap_lockPixels(env, bitmap, &data)) < 0) {
+  int32_t result = AndroidBitmap_lockPixels(env, bitmap, &data);
+  if (result < 0) {
     LOGE("Error in AndroidBitmap_lockPixels. errorCode: %d", result);
-    return;
-  }
-
-  AndroidBitmapInfo info;
-  if ((result = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-    LOGE("Error in AndroidBitmap_getInfo. errorCode: %d", result);
     return;
   }
 
@@ -196,7 +186,7 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_draw(
     std::lock_guard<std::mutex> lock(gLock);
     auto const &it = gImageMap.find(id);
     if (it != gImageMap.end()) {
-      image = gImageMap[id];
+        image = it->second; // Fetch the image
     }
   }
 
@@ -205,11 +195,12 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_draw(
     return;
   }
 
-  std::shared_ptr<ApngFrame> frame = image->getFrame(static_cast<const uint32_t>(index));
+  auto const frame = image->getFrame(static_cast<const uint32_t>(index));
   if (!frame) {
     AndroidBitmap_unlockPixels(env, bitmap);
     return;
   }
+
   memcpy(data, frame->getRawPixels(), image->getFrameByteCount());
   AndroidBitmap_unlockPixels(env, bitmap);
 }
