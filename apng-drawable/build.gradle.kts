@@ -1,26 +1,27 @@
+@file:Suppress("UnstableApiUsage")
+
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlintGradleVersion
-    id("org.jetbrains.dokka") version Versions.dokkaVersion
-    id("com.github.ben-manes.versions") version Versions.gradleVersionsPluginVersion
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ktlint.gradle)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.gradle.versions.plugin)
     `maven-publish`
     signing
 }
 
-group = ModuleConfig.groupId
-version = ModuleConfig.version
+group = "com.linecorp"
+version = libs.versions.apng.drawable.get()
 
 android {
     namespace = "com.linecorp.apng"
 
     defaultConfig {
-        minSdk = Versions.minSdkVersion
-        compileSdk = Versions.compileSdkVersion
-        lint.targetSdk = Versions.targetSdkVersion
-        version = ModuleConfig.version
+        minSdk = libs.versions.build.minSdk.get().toInt()
+        compileSdk = libs.versions.build.compileSdk.get().toInt()
+        lint.targetSdk = libs.versions.build.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles(
             file("proguard-rules.pro")
@@ -63,7 +64,7 @@ android {
             }
         }
     }
-    ndkVersion = Versions.ndkVersion
+    ndkVersion = libs.versions.build.ndk.get()
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
@@ -73,11 +74,11 @@ android {
         xmlReport = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 
@@ -89,53 +90,23 @@ ktlint {
 }
 
 dependencies {
-    api(kotlin("stdlib", Versions.kotlinVersion))
-    api(Libs.androidxAnnotation)
-    api(Libs.androidxVectorDrawable)
+    api(libs.androidx.annotation)
+    api(libs.androidx.animated.vectordrawable)
 
-    testImplementation(Libs.junit)
-    testImplementation(Libs.robolectric)
-    testImplementation(Libs.mockitoInline)
-    testImplementation(Libs.mockitoKotlin)
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.mockito)
+    testImplementation(libs.mockito.kotlin)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("apngDrawable") {
-                groupId = ModuleConfig.groupId
-                artifactId = ModuleConfig.artifactId
-                version = ModuleConfig.version
-                pom {
-                    packaging = "aar"
-                    name.set(ModuleConfig.name)
-                    description.set(ModuleConfig.description)
-                    url.set(ModuleConfig.siteUrl)
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                            distribution.set("repo")
-                        }
-                    }
-                    developers {
-                        developer {
-                            name.set("LINE Corporation")
-                            email.set("dl_oss_dev@linecorp.com")
-                            url.set("https://engineering.linecorp.com/en/")
-                        }
-                    }
-                    scm {
-                        connection.set(ModuleConfig.scmConnectionUrl)
-                        developerConnection.set(ModuleConfig.scmDeveloperConnectionUrl)
-                        url.set(ModuleConfig.scmUrl)
-                    }
-                    issueManagement {
-                        system.set("GitHub")
-                        url.set(ModuleConfig.issueTrackerUrl)
-                    }
-                }
+publishing {
+    publications {
+        create<MavenPublication>("apngDrawable") {
+            groupId = "com.linecorp"
+            artifactId = "apng"
+            version = libs.versions.apng.drawable.get()
 
+            afterEvaluate {
                 from(components["release"])
             }
         }

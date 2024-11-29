@@ -1,16 +1,18 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.linecorp.apngsample"
 
+    ndkVersion = libs.versions.build.ndk.get()
+
     defaultConfig {
         applicationId = "com.linecorp.apngsample"
-        minSdk = Versions.minSdkVersion
-        compileSdk = Versions.compileSdkVersion
-        targetSdk = Versions.targetSdkVersion
+        minSdk = libs.versions.build.minSdk.get().toInt()
+        compileSdk = libs.versions.build.compileSdk.get().toInt()
+        targetSdk = libs.versions.build.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
         missingDimensionStrategy("env", "androidx")
@@ -34,20 +36,19 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 
 dependencies {
-    implementation(kotlin("stdlib", Versions.kotlinVersion))
-    implementation(Libs.androidxAppcompat)
-    implementation(Libs.androidxConstraintLayout)
-    implementation(Libs.kotlinxCoroutines)
-    implementation(Libs.lichLifecycle)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.lich.lifecycle)
 
     implementation(project(":apng-drawable"))
 }

@@ -6,17 +6,6 @@ pluginManagement {
         mavenCentral()
         google()
     }
-    resolutionStrategy {
-        eachPlugin {
-            val moduleName = when (requested.id.id) {
-                "com.android.application",
-                "com.android.library" -> "com.android.tools.build:gradle:${requested.version}"
-                "kotlin-android" -> "org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}"
-                else -> null
-            }
-            moduleName?.let(::useModule)
-        }
-    }
 }
 
 include(":apng-drawable")
