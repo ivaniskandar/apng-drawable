@@ -63,12 +63,6 @@ internal class Apng(
     val byteCount: Int
         get() = bitmap.allocationByteCount
 
-    init {
-        Trace.beginSection("Apng#draw")
-        ApngDecoderJni.draw(id, 0, bitmap)
-        Trace.endSection()
-    }
-
     /**
      * The duration to animate one loop of APNG animation.
      */
@@ -83,6 +77,7 @@ internal class Apng(
 
     fun recycle() {
         ApngDecoderJni.recycle(id)
+        bitmap.recycle()
     }
 
     fun copy(): Apng = copy(this)
