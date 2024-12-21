@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 project(apng)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Ofast")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
+
 #
 # png
 #
