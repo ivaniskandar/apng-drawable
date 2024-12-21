@@ -87,7 +87,6 @@ internal class Apng(
 
     fun copy(): Apng = copy(this)
 
-    @Suppress("unused")
     fun finalize() {
         if (DEBUG) {
             Log.d("apng-drawable", "finalized: $id")
@@ -100,8 +99,13 @@ internal class Apng(
      */
     fun drawWithIndex(frameIndex: Int, canvas: Canvas, src: Rect?, dst: Rect, paint: Paint) {
         Trace.beginSection("Apng#draw")
-        ApngDecoderJni.draw(id, frameIndex, bitmap)
-        Trace.endSection()
+        try {
+            ApngDecoderJni.draw(id, frameIndex, bitmap)
+        } catch (e: Throwable) {
+            Log.e("apng-drawable", "Failed to draw $id frame index: $frameIndex", e)
+        } finally {
+            Trace.endSection()
+        }
         canvas.drawBitmap(bitmap, src, dst, paint)
     }
 

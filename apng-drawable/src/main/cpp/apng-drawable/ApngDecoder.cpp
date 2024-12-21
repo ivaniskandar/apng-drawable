@@ -201,7 +201,7 @@ std::unique_ptr<ApngImage> ApngDecoder::decode(
   std::unique_ptr<uint8_t[]> p_buffer(new uint8_t[size]());
   std::unique_ptr<uint8_t[]> p_previous_frame(new uint8_t[size]());
   // Check unsigned integer wrapping
-  if (height > SIZE_MAX / sizeof(png_bytep)) {
+  if (static_cast<size_t>(height) > SIZE_MAX / sizeof(png_bytep)) {
     png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
     result = ERR_INVALID_FILE_FORMAT;
     return nullptr;

@@ -190,6 +190,8 @@ class ApngDrawable @VisibleForTesting internal constructor(
         paint.alpha = alpha
     }
 
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int = PixelFormat.TRANSPARENT
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
@@ -243,7 +245,7 @@ class ApngDrawable @VisibleForTesting internal constructor(
 
     override fun clearAnimationCallbacks() = animationCallbacks.clear()
 
-    override fun getConstantState(): ConstantState? = apngState
+    override fun getConstantState(): ConstantState = apngState
 
     override fun mutate(): Drawable {
         apngState = ApngState(apngState)

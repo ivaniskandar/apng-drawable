@@ -32,7 +32,7 @@ class ApngException internal constructor(
         throwable: Throwable
     ) : this(ErrorCode.ERR_WITH_CHILD_EXCEPTION, throwable)
 
-    override val message: String?
+    override val message: String
         get() = when (errorCode) {
             ErrorCode.ERR_STREAM_READ_FAIL -> "Can't read the stream."
             ErrorCode.ERR_UNEXPECTED_EOF -> "Unexpected end of file."
@@ -87,7 +87,7 @@ class ApngException internal constructor(
 
         companion object {
             internal fun fromErrorCode(errorCode: Int): ErrorCode =
-                ErrorCode.values().first { it.errorCode == errorCode }
+                entries.first { it.errorCode == errorCode }
         }
     }
 }
