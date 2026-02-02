@@ -84,10 +84,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   gResult_class = nullptr;
   StreamSource::unregisterJavaClass(env);
 
-  auto it = gImageMap.begin();
-  for (; it != gImageMap.end(); ++it) {
-    gImageMap.erase(it);
-  }
+  std::lock_guard<std::mutex> lock(gLock);
+  gImageMap.clear();
 }
 
 JNIEXPORT jint JNICALL
@@ -106,7 +104,7 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_decode(
   int32_t resultCode;
 
   // decode
-  std::unique_ptr<StreamSource> source(new StreamSource(env, inputStream));
+  auto source = std::make_unique<StreamSource>(env, inputStream);
   std::shared_ptr<ApngImage> image = std::move(ApngDecoder::decode(std::move(source), resultCode));
 
   LOGV(" | decode result: %d", resultCode);
@@ -157,7 +155,7 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_isApng(
     jobject inputStream
 ) {
   // check
-  std::unique_ptr<StreamSource> source(new StreamSource(env, inputStream));
+  auto source = std::make_unique<StreamSource>(env, inputStream);
   bool result = ApngDecoder::isApng(std::move(source));
   return static_cast<jboolean>(result);
 }
@@ -174,34 +172,32 @@ Java_com_linecorp_apng_decoder_ApngDecoderJni_draw(
     return;
   }
 
-  void *data;
-  int32_t result = AndroidBitmap_lockPixels(env, bitmap, &data);
-  if (result < 0) {
-    LOGE("Error in AndroidBitmap_lockPixels. errorCode: %d", result);
+  void *bitmapPixels;
+  if (AndroidBitmap_lockPixels(env, bitmap, &bitmapPixels) < 0) {
+    LOGE("Error: AndroidBitmap_lockPixels failed.");
     return;
   }
 
-  std::shared_ptr<ApngImage> image = nullptr;
+  const void* framePixels = nullptr;
+  size_t bytesToCopy = 0;
+
   {
     std::lock_guard<std::mutex> lock(gLock);
-    auto const &it = gImageMap.find(id);
+    const auto it = gImageMap.find(id);
     if (it != gImageMap.end()) {
-        image = it->second; // Fetch the image
+      const auto& image = it->second;
+      const auto frame = image->getFrame(static_cast<uint32_t>(index));
+      if (frame) {
+          framePixels = frame->getRawPixels();
+          bytesToCopy = image->getFrameByteCount();
+      }
     }
   }
 
-  if (!image) {
-    AndroidBitmap_unlockPixels(env, bitmap);
-    return;
+  if (framePixels) {
+    memcpy(bitmapPixels, framePixels, bytesToCopy);
   }
 
-  auto const frame = image->getFrame(static_cast<const uint32_t>(index));
-  if (!frame) {
-    AndroidBitmap_unlockPixels(env, bitmap);
-    return;
-  }
-
-  memcpy(data, frame->getRawPixels(), image->getFrameByteCount());
   AndroidBitmap_unlockPixels(env, bitmap);
 }
 

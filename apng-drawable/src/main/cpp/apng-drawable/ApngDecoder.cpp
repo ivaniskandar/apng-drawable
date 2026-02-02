@@ -25,9 +25,9 @@
 
 namespace apng_drawable {
 
-const uint8_t ALPHA_TRANSPARENT = 0U;
-const uint8_t ALPHA_OPAQUE = 0xFFU;
-const size_t CHANNEL_4_BYTE_SIZE = sizeof(uint8_t) * 4;
+constexpr uint8_t ALPHA_TRANSPARENT = 0U;
+constexpr uint8_t ALPHA_OPAQUE = 0xFFU;
+constexpr size_t CHANNEL_4_BYTE_SIZE = sizeof(uint8_t) * 4;
 
 inline void saveFrame(uint32_t *destination,
                       uint32_t **const source,
@@ -76,24 +76,32 @@ inline void blendOver(
     uint8_t *sp = source[j];
     uint8_t *dp = destination[j + y_offset] + x_offset * CHANNEL_4_BYTE_SIZE;
     uint8_t sourceAlpha;
-    for (uint32_t i = 0; i < width; ++i, sp += CHANNEL_4_BYTE_SIZE, dp += CHANNEL_4_BYTE_SIZE) {
+    for (uint32_t i = 0; i < width; ++i, sp += 4, dp += 4) {
       sourceAlpha = sp[3];
-      if (sourceAlpha == ALPHA_OPAQUE) {
-        memcpy(dp, sp, CHANNEL_4_BYTE_SIZE);
-      } else if (sourceAlpha != ALPHA_TRANSPARENT) {
-        if (dp[3] != ALPHA_TRANSPARENT) {
-          int32_t u = sourceAlpha * ALPHA_OPAQUE;
-          int32_t v = (ALPHA_OPAQUE - sourceAlpha) * dp[3];
-          int32_t al =
-              ALPHA_OPAQUE * ALPHA_OPAQUE - (ALPHA_OPAQUE - sourceAlpha) * (ALPHA_OPAQUE - dp[3]);
-          dp[0] = static_cast<uint8_t>((sp[0] * u + dp[0] * v) / al);
-          dp[1] = static_cast<uint8_t>((sp[1] * u + dp[1] * v) / al);
-          dp[2] = static_cast<uint8_t>((sp[2] * u + dp[2] * v) / al);
-          dp[3] = static_cast<uint8_t>(al / ALPHA_OPAQUE);
-        } else {
-          memcpy(dp, sp, CHANNEL_4_BYTE_SIZE);
-        }
+      if (sourceAlpha == 255) { // ALPHA_OPAQUE
+        *reinterpret_cast<uint32_t*>(dp) = *reinterpret_cast<uint32_t*>(sp);
+        continue;
       }
+      if (sourceAlpha == 0) { // ALPHA_TRANSPARENT
+        continue;
+      }
+      uint8_t destAlpha = dp[3];
+      if (destAlpha == 0) {
+        *reinterpret_cast<uint32_t*>(dp) = *reinterpret_cast<uint32_t*>(sp);
+        continue;
+      }
+      // OutputAlpha = SrcAlpha + DstAlpha * (255 - SrcAlpha) / 255
+      uint16_t outAlpha = sourceAlpha + (destAlpha * (255 - sourceAlpha) + 128) / 255;
+      if (outAlpha == 0) {
+        dp[0] = 0; dp[1] = 0; dp[2] = 0;
+      } else {
+        // OutputColor = (SrcColor * SrcAlpha + DstColor * DstAlpha * (255 - SrcAlpha) / 255) / OutputAlpha
+        uint16_t destAlphaFactor = (destAlpha * (255 - sourceAlpha) + 128) / 255;
+        dp[0] = (sp[0] * sourceAlpha + dp[0] * destAlphaFactor + 128) / outAlpha;
+        dp[1] = (sp[1] * sourceAlpha + dp[1] * destAlphaFactor + 128) / outAlpha;
+        dp[2] = (sp[2] * sourceAlpha + dp[2] * destAlphaFactor + 128) / outAlpha;
+      }
+      dp[3] = static_cast<uint8_t>(outAlpha);
     }
   }
 }

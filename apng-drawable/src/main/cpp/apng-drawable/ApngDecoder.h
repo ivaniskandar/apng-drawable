@@ -25,14 +25,14 @@ namespace apng_drawable {
  * Creates the integer value containing color information with ABGR format.
  * Android is using RGBA format internally, and uses ABGR because of endianness.
  */
-inline uint32_t abgr(uint32_t a, uint32_t b, uint32_t g, uint32_t r) {
+constexpr uint32_t abgr(uint32_t a, uint32_t b, uint32_t g, uint32_t r) {
   return r | g << 8u | b << 16u | a << 24u;
 }
 
 /**
  * Returns `a * b / 255` and rounding any fractional bits.
  */
-inline uint32_t div255Round(uint32_t a, uint32_t b) {
+constexpr uint32_t div255Round(uint32_t a, uint32_t b) {
   return a * b * 0x8081u >> 23u & 0xFFu;
 }
 
