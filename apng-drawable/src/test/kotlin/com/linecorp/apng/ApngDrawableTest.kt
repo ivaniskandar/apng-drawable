@@ -22,24 +22,26 @@ import android.graphics.drawable.Drawable
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import com.linecorp.apng.decoder.Apng
 import com.linecorp.apng.utils.assertFailureMessage
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Test for [ApngDrawable].
  */
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class ApngDrawableTest {
 
     @Mock
@@ -52,7 +54,7 @@ class ApngDrawableTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         whenever(nBitmapAnimation.width).thenReturn(200)
         whenever(nBitmapAnimation.height).thenReturn(100)
         whenever(nBitmapAnimation.frameCount).thenReturn(10)

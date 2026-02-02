@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
@@ -7,7 +8,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint.gradle)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.gradle.versions.plugin)
     `maven-publish`
     signing
 }
@@ -54,7 +54,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android.txt"),
+                getDefaultProguardFile("proguard-android-optimize.txt"),
                 file("proguard-rules.pro")
             )
             externalNativeBuild {
@@ -77,8 +77,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 
