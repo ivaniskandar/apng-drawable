@@ -5,11 +5,9 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ktlint.gradle)
     alias(libs.plugins.dokka)
     `maven-publish`
-    signing
 }
 
 group = "com.linecorp"
@@ -34,11 +32,6 @@ android {
                 arguments += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
             }
         }
-    }
-    sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
-        getByName("test").java.srcDirs("src/test/kotlin")
-        getByName("androidTest").java.srcDirs("src/androidTest/kotlin")
     }
     buildTypes {
         debug {
@@ -77,6 +70,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 kotlin {
@@ -108,7 +106,6 @@ publishing {
             groupId = "com.linecorp"
             artifactId = "apng"
             version = libs.versions.apng.drawable.get()
-
             afterEvaluate {
                 from(components["release"])
             }

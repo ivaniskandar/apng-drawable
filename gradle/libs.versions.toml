@@ -6,9 +6,6 @@ build-targetSdk = "36"
 build-ndk = "27.3.13750724"
 apng-drawable = "0.1.0"
 
-# https://github.com/JetBrains/kotlin/releases
-kotlin = "2.3.0"
-
 # https://developer.android.com/build/releases/gradle-plugin
 android-gradle-plugin = "9.0.0"
 
@@ -16,10 +13,7 @@ android-gradle-plugin = "9.0.0"
 ktlint-gradle = "14.0.1"
 
 # https://github.com/Kotlin/dokka/releases
-dokka = "2.1.0"
-
-# https://github.com/ben-manes/gradle-versions-plugin/releases
-gradle-versions-plugin = "0.53.0"
+dokka = "2.2.0-Beta"
 
 # https://github.com/Codearte/gradle-nexus-staging-plugin/releases
 nexus-staging = "0.30.0"
@@ -71,8 +65,6 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 nexus-staging = { id = "io.codearte.nexus-staging", version.ref = "nexus-staging" }
 ktlint-gradle = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-gradle-versions-plugin = { id = "com.github.ben-manes.versions", version.ref = "gradle-versions-plugin" }

@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -18,9 +17,6 @@ android {
         versionCode = 1
         versionName = "1.0"
         missingDimensionStrategy("env", "androidx")
-    }
-    sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
     }
     buildTypes {
         debug {
